@@ -4,28 +4,20 @@ import { useTheme } from '../context/ThemeContext';
 import { ProdimaLogo } from './ProdimaLogo';
 import {
   Bell,
-  User,
-  Shield,
   LogOut,
-  ChevronDown,
-  CheckCircle2,
   AlertTriangle,
-  AlertCircle,
-  Info,
   Menu,
   Sun,
   Moon,
   Monitor,
   Trash2,
-  Check
+  Check,
+  KeyRound
 } from 'lucide-react';
 
 interface NavbarProps {
   currentUser: Usuario;
   activeRole?: RolUsuario;
-  onRoleChange?: (role: RolUsuario) => void;
-  onRoleSwitch?: (role: RolUsuario) => void;
-  onSwitchUserAccount?: (username: string) => void;
   alertas?: Alerta[];
   unreadAlertsCount?: number;
   onMarkAlertRead?: (id: number) => void;
@@ -42,9 +34,6 @@ interface NavbarProps {
 export const Navbar: React.FC<NavbarProps> = ({
   currentUser,
   activeRole,
-  onRoleChange,
-  onRoleSwitch,
-  onSwitchUserAccount,
   alertas = [],
   unreadAlertsCount,
   onMarkAlertRead,
@@ -53,7 +42,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   onClearAllAlerts,
   onNavigateToAlerts,
   onOpenAlerts,
-  onOpenLoginModal: _onOpenLoginModal,
+  onOpenLoginModal,
   onToggleMobileMenu,
   onLogout
 }) => {
@@ -274,6 +263,21 @@ export const Navbar: React.FC<NavbarProps> = ({
                   </div>
                   <p className="text-slate-400 text-[11px] mt-0.5 truncate">{currentUser.correo}</p>
                 </div>
+
+                {onOpenLoginModal && (
+                  <div className="p-1.5 border-b border-slate-700/60">
+                    <button
+                      onClick={() => {
+                        setShowUserDropdown(false);
+                        onOpenLoginModal();
+                      }}
+                      className="w-full text-left px-2.5 py-1.5 rounded-lg flex items-center gap-2 text-xs text-amber-400 hover:bg-amber-500/10 transition font-semibold"
+                    >
+                      <KeyRound className="w-3.5 h-3.5 text-amber-400" />
+                      <span>Cambiar de Cuenta</span>
+                    </button>
+                  </div>
+                )}
 
                 {onLogout && (
                   <div className="p-1.5">

@@ -85,7 +85,8 @@ export const INITIAL_TECNICOS: Tecnico[] = [
     puesto: 'Especialista Técnico TIG / Inoxidables PRODIMA',
     fecha_ingreso: '2023-03-15',
     estado: 'Activo',
-    usuario_id: 4
+    usuario_id: 4,
+    homologado: true
   },
   {
     id: 2,
@@ -98,7 +99,8 @@ export const INITIAL_TECNICOS: Tecnico[] = [
     puesto: 'Técnico Soldador Especialista de Campo',
     fecha_ingreso: '2023-06-01',
     estado: 'Activo',
-    usuario_id: 5
+    usuario_id: 5,
+    homologado: true
   },
   {
     id: 3,
@@ -111,7 +113,8 @@ export const INITIAL_TECNICOS: Tecnico[] = [
     puesto: 'Técnico de Servicio Heavy Duty & Estructuras',
     fecha_ingreso: '2022-11-10',
     estado: 'Activo',
-    usuario_id: null
+    usuario_id: null,
+    homologado: true
   },
   {
     id: 4,
@@ -124,7 +127,8 @@ export const INITIAL_TECNICOS: Tecnico[] = [
     puesto: 'Especialista en Corte Plasma & Oxicorte Victor',
     fecha_ingreso: '2021-08-20',
     estado: 'Activo',
-    usuario_id: null
+    usuario_id: null,
+    homologado: true
   },
   {
     id: 5,
@@ -137,7 +141,8 @@ export const INITIAL_TECNICOS: Tecnico[] = [
     puesto: 'Técnico de Taller Central Mariscal Zona 11',
     fecha_ingreso: '2024-01-12',
     estado: 'Activo',
-    usuario_id: null
+    usuario_id: null,
+    homologado: true
   }
 ];
 
@@ -309,13 +314,57 @@ export const INITIAL_ASIGNACIONES: Asignacion[] = [
   {
     id: 4,
     tecnico_id: 4,
-    maquina_id: 3,
-    fecha_asignacion: '2026-05-10T08:00:00Z',
-    fecha_devolucion: '2026-06-25T17:00:00Z',
-    motivo: 'Fabricación y calibración de tanques de combustible en Cervecería Centro Americana',
-    estado: 'Finalizada',
+    maquina_id: 4,
+    fecha_asignacion: '2026-08-10T08:00:00Z',
+    fecha_devolucion: null,
+    motivo: 'Mantenimiento preventivo y sustitución de consumibles de antorcha de corte plasma',
+    estado: 'Activa',
+    usuario_responsable: 'rgarcia',
+    observaciones: 'Asignación directa para ejecución de orden de mantenimiento preventivo ESAB.'
+  },
+  {
+    id: 5,
+    tecnico_id: 5,
+    maquina_id: 7,
+    fecha_asignacion: '2026-08-01T08:00:00Z',
+    fecha_devolucion: null,
+    motivo: 'Mantenimiento correctivo de placa IGBT y calibración metrológica ISO 9001',
+    estado: 'Activa',
     usuario_responsable: 'admin',
-    observaciones: 'Devuelta a la bodega de PRODIMA Zona 11 en perfecto estado tras pruebas no destructivas (PT).'
+    observaciones: 'Asignada en taller central Mariscal para pruebas de arco y aislamiento.'
+  },
+  {
+    id: 6,
+    tecnico_id: 1,
+    maquina_id: 3,
+    fecha_asignacion: '2026-08-20T08:00:00Z',
+    fecha_devolucion: null,
+    motivo: 'Inspección de rutina y actualización de firmware sMIG de control digital',
+    estado: 'Activa',
+    usuario_responsable: 'admin',
+    observaciones: 'Asignación directa para calibración y mantenimiento programado.'
+  },
+  {
+    id: 7,
+    tecnico_id: 2,
+    maquina_id: 5,
+    fecha_asignacion: '2026-08-18T08:00:00Z',
+    fecha_devolucion: null,
+    motivo: 'Verificación preventiva del módulo de alta frecuencia HF y bornes DINSE',
+    estado: 'Activa',
+    usuario_responsable: 'rgarcia',
+    observaciones: 'Asignación directa al técnico para revisión técnica en taller.'
+  },
+  {
+    id: 8,
+    tecnico_id: 4,
+    maquina_id: 8,
+    fecha_asignacion: '2026-08-05T08:00:00Z',
+    fecha_devolucion: null,
+    motivo: 'Reparación correctiva de alternador y sistema de encendido motor Kohler',
+    estado: 'Activa',
+    usuario_responsable: 'admin',
+    observaciones: 'Asignación técnica para diagnóstico y reconstrucción electromecánica.'
   }
 ];
 
@@ -329,7 +378,7 @@ export const INITIAL_MANTENIMIENTOS: Mantenimiento[] = [
     fecha_fin: '2026-08-18',
     costo: 3450.00,
     proveedor: 'PRODIMA Servicio Técnico Especializado (Sede Mariscal)',
-    tecnico_responsable: 'Ing. Roberto García',
+    tecnico_responsable: 'Edwin Francisco Chavez Cano',
     estado: 'En proceso',
     observaciones: 'Módulo de potencia calibrado con osciloscopio y banco de carga resistivo.'
   },
@@ -342,7 +391,7 @@ export const INITIAL_MANTENIMIENTOS: Mantenimiento[] = [
     fecha_fin: '2026-06-11',
     costo: 850.00,
     proveedor: 'PRODIMA Taller Central de Mantenimiento',
-    tecnico_responsable: 'Mario Renald Estrada',
+    tecnico_responsable: 'David López',
     estado: 'Finalizado',
     observaciones: 'Certificado de aislamiento y prueba de arco superados al 100% de amperaje.'
   },
@@ -355,7 +404,7 @@ export const INITIAL_MANTENIMIENTOS: Mantenimiento[] = [
     fecha_fin: '2026-08-17',
     costo: 950.00,
     proveedor: 'PRODIMA Guatemala (División Corte y Plasma)',
-    tecnico_responsable: 'Gustavo Adolfo Ramírez Soto',
+    tecnico_responsable: 'Byron Alexánder Morales Alvarado',
     estado: 'En proceso',
     observaciones: 'Consumibles originales ESAB Handyplasma instalados.'
   },
@@ -368,9 +417,61 @@ export const INITIAL_MANTENIMIENTOS: Mantenimiento[] = [
     fecha_fin: '2026-08-26',
     costo: 600.00,
     proveedor: 'PRODIMA Servicios Técnicos Centrales',
-    tecnico_responsable: 'Juan José López',
+    tecnico_responsable: 'David López',
     estado: 'Programado',
     observaciones: 'Mantenimiento preventivo programado antes de próxima asignación en campo.'
+  },
+  {
+    id: 5,
+    maquina_id: 2,
+    tipo: 'Preventivo',
+    descripcion: 'Mantenimiento preventivo y calibración de estabilidad de arco en proceso Live TIG.',
+    fecha_inicio: '2026-08-15',
+    fecha_fin: '2026-08-20',
+    costo: 750.00,
+    proveedor: 'PRODIMA Servicios Técnicos',
+    tecnico_responsable: 'Ilsser Guatemala',
+    estado: 'En proceso',
+    observaciones: 'Revisión técnica de campo en planta Aceros de Guatemala.'
+  },
+  {
+    id: 6,
+    maquina_id: 5,
+    tipo: 'Preventivo',
+    descripcion: 'Inspección de circuito HF de alta frecuencia y bornes de potencia DINSE para TIG AC/DC.',
+    fecha_inicio: '2026-08-28',
+    fecha_fin: '2026-08-30',
+    costo: 890.00,
+    proveedor: 'PRODIMA Taller Especializado',
+    tecnico_responsable: 'Ilsser Guatemala',
+    estado: 'Programado',
+    observaciones: 'Programado para calibración periódica de alta precisión.'
+  },
+  {
+    id: 7,
+    maquina_id: 6,
+    tipo: 'Preventivo',
+    descripcion: 'Calibración certificada Waveform Control y limpieza interna de túnel de aire refrigerante.',
+    fecha_inicio: '2026-08-10',
+    fecha_fin: '2026-08-14',
+    costo: 1200.00,
+    proveedor: 'Lincoln Electric Guatemala / PRODIMA',
+    tecnico_responsable: 'Mario Renald Estrada Gómez',
+    estado: 'En proceso',
+    observaciones: 'Mantenimiento preventivo oficial bajo póliza de garantía.'
+  },
+  {
+    id: 8,
+    maquina_id: 8,
+    tipo: 'Correctivo',
+    descripcion: 'Desarme de módulo generador, bobinado de estator y reemplazo de diodos rectificadores.',
+    fecha_inicio: '2026-08-05',
+    fecha_fin: '2026-08-22',
+    costo: 4200.00,
+    proveedor: 'Servicios Industriales y Motores GT',
+    tecnico_responsable: 'Byron Alexánder Morales Alvarado',
+    estado: 'En proceso',
+    observaciones: 'Diagnóstico correctivo y reconstrucción electromecánica.'
   }
 ];
 

@@ -11,7 +11,6 @@ import {
   X,
   Phone,
   Mail,
-  Calendar,
   Award,
   Cpu,
   Wrench,

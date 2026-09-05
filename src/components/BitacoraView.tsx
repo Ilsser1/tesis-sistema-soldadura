@@ -3,12 +3,7 @@ import { Bitacora, RolUsuario } from '../types';
 import {
   ShieldCheck,
   Search,
-  Filter,
-  Shield,
-  Calendar,
-  User,
-  Activity,
-  FileSpreadsheet
+  Shield
 } from 'lucide-react';
 
 interface BitacoraViewProps {

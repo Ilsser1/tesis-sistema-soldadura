@@ -13,7 +13,6 @@ import {
   FileWarning,
   FileX,
   Bell,
-  BarChart2,
   TrendingUp,
   Layers
 } from 'lucide-react';
@@ -25,8 +24,7 @@ import {
   YAxis,
   Tooltip,
   CartesianGrid,
-  Cell,
-  Legend
+  Cell
 } from 'recharts';
 
 interface DashboardViewProps {

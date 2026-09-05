@@ -9,8 +9,6 @@ import {
   XCircle,
   AlertTriangle,
   Clock,
-  UserCheck,
-  Cpu,
   X,
   FileCheck,
   AlertCircle
@@ -50,6 +48,9 @@ export const AsignacionesView: React.FC<AsignacionesViewProps> = ({
   // Filter available machines for selection
   const maquinasElegibles = (maquinas || []).filter(m => m.estado === 'Disponible');
 
+  // Técnicos propios homologados y activos
+  const tecnicosHomologados = (tecnicos || []).filter(t => t.estado === 'Activo' && t.homologado === true);
+
   const {
     register,
     handleSubmit,
@@ -77,7 +78,7 @@ export const AsignacionesView: React.FC<AsignacionesViewProps> = ({
   const handleOpenCreateModal = () => {
     setErrorMessage(null);
     reset({
-      tecnico_id: (tecnicos || []).length > 0 ? tecnicos[0].id : '',
+      tecnico_id: tecnicosHomologados.length > 0 ? tecnicosHomologados[0].id : '',
       maquina_id: maquinasElegibles.length > 0 ? maquinasElegibles[0].id : '',
       motivo: 'Asignación de equipo para montaje y soldadura de estructuras metálicas',
       observaciones: 'Equipo revisado con kit de cables, pinza de masa y antorcha.'
@@ -87,7 +88,13 @@ export const AsignacionesView: React.FC<AsignacionesViewProps> = ({
 
   const onSubmit = async (data: AsignacionFormInputs) => {
     if (!data.tecnico_id || !data.maquina_id) {
-      setErrorMessage('Debe seleccionar un técnico y una máquina válida.');
+      setErrorMessage('Debe seleccionar un técnico propio homologado y una máquina válida.');
+      return;
+    }
+
+    const tecValid = tecnicosHomologados.find(t => t.id === Number(data.tecnico_id));
+    if (!tecValid) {
+      setErrorMessage('El técnico seleccionado debe ser un técnico propio homologado y activo.');
       return;
     }
 
@@ -271,21 +278,21 @@ export const AsignacionesView: React.FC<AsignacionesViewProps> = ({
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-3.5 text-xs">
               <div>
                 <label className="block text-slate-400 mb-1 font-semibold">
-                  Seleccionar Técnico Especialista <span className="text-amber-400">*</span>
+                  Técnicos Propios Homologados <span className="text-amber-400">*</span>
                 </label>
                 <select
                   {...register('tecnico_id', {
-                    required: 'Debe seleccionar un técnico',
+                    required: 'Debe seleccionar un técnico propio homologado',
                     validate: v => Number(v) > 0 || 'Seleccione un técnico válido'
                   })}
                   className={`w-full bg-slate-800 border rounded-lg p-2.5 text-slate-200 focus:outline-none transition ${
                     errors.tecnico_id ? 'border-red-500 bg-red-500/5 focus:border-red-500' : 'border-slate-700 focus:border-amber-500'
                   }`}
                 >
-                  <option value="">-- Seleccionar Técnico --</option>
-                  {tecnicos.map(t => (
+                  <option value="">-- Seleccionar Técnico Propio Homologado --</option>
+                  {tecnicosHomologados.map(t => (
                     <option key={t.id} value={t.id}>
-                      {t.nombre} {t.apellido} — {t.especialidad} (DPI: {t.DPI})
+                      {t.nombre} {t.apellido} — {t.especialidad} (Homologado)
                     </option>
                   ))}
                 </select>

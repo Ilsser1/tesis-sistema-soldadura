@@ -3,13 +3,9 @@ import { Maquina, HistorialCompletoMaquina } from '../types';
 import {
   History,
   Search,
-  Cpu,
-  Calendar,
-  User,
   Wrench,
   FileText,
   Link2,
-  CheckCircle2,
   Activity
 } from 'lucide-react';
 

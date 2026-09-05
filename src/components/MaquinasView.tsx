@@ -9,12 +9,8 @@ import {
   Edit2,
   Trash2,
   X,
-  Wrench,
-  CheckCircle2,
-  AlertOctagon,
   Clock,
   History,
-  FileText,
   AlertCircle,
   Lock,
   Sparkles
@@ -115,7 +111,6 @@ export const MaquinasView: React.FC<MaquinasViewProps> = ({
   // Watch marca y fecha_adquisicion para auto-generar el código único cuando es nueva máquina
   const watchedMarca = useWatch({ control, name: 'marca' });
   const watchedFecha = useWatch({ control, name: 'fecha_adquisicion' });
-  const watchedCodigo = useWatch({ control, name: 'codigo_interno' });
 
   useEffect(() => {
     // Solo auto-generar si estamos creando una máquina nueva (no editando)

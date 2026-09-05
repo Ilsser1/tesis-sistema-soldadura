@@ -1,4 +1,3 @@
-import 'dotenv/config';
 import express, { Request, Response } from 'express';
 import path from 'path';
 import { createServer as createViteServer } from 'vite';
@@ -6,11 +5,7 @@ import { db } from './server/db.js';
 
 async function startServer() {
   const app = express();
-  const PORT = Number(process.env.PORT) || 3000;
-
-  // Inicializa persistencia remota (Supabase) si está configurada.
-  // Si no hay variables de Supabase, mantiene el modo local data/db.json.
-  await db.init();
+  const PORT = 3000;
 
   app.use(express.json());
 
@@ -24,20 +19,9 @@ async function startServer() {
   // REST API ENDPOINTS
   // ======================================================
 
-  // Salud del servicio: Render usa este endpoint para verificar que la app inició correctamente.
-  app.get('/api/health', (_req: Request, res: Response) => {
-    res.json({
-      status: 'ok',
-      service: 'sistema-gestion-tecnicos-soldadura',
-      persistence: db.getPersistenceMode(),
-      timestamp: new Date().toISOString()
-    });
-  });
-
-
   // AUTENTICACIÓN
   app.post('/api/auth/login', (req: Request, res: Response) => {
-    const { username, email, correo, password } = req.body;
+    const { username, email, correo } = req.body;
     const usuarios = db.getUsuarios();
     const term = (username || email || correo || '').toLowerCase().trim();
     const usuario = usuarios.find(u => 
@@ -58,7 +42,7 @@ async function startServer() {
     });
   });
 
-  app.post('/api/auth/refresh', (req: Request, res: Response) => {
+  app.post('/api/auth/refresh', (_req: Request, res: Response) => {
     return res.json({ status: 'ok', token: `jwt_refreshed_${Date.now()}` });
   });
 
@@ -68,13 +52,13 @@ async function startServer() {
     return res.json({ status: 'logged_out' });
   });
 
-  app.get('/api/auth/me', (req: Request, res: Response) => {
+  app.get('/api/auth/me', (_req: Request, res: Response) => {
     const user = db.getUsuarioById(1);
     return res.json(user);
   });
 
   // USUARIOS
-  app.get('/api/usuarios', (req: Request, res: Response) => {
+  app.get('/api/usuarios', (_req: Request, res: Response) => {
     res.json(db.getUsuarios());
   });
 
@@ -126,7 +110,7 @@ async function startServer() {
   });
 
   // TÉCNICOS
-  app.get('/api/tecnicos', (req: Request, res: Response) => {
+  app.get('/api/tecnicos', (_req: Request, res: Response) => {
     res.json(db.getTecnicos());
   });
 
@@ -164,7 +148,7 @@ async function startServer() {
   });
 
   // MÁQUINAS DE SOLDAR
-  app.get('/api/maquinas', (req: Request, res: Response) => {
+  app.get('/api/maquinas', (_req: Request, res: Response) => {
     res.json(db.getMaquinas());
   });
 
@@ -202,7 +186,7 @@ async function startServer() {
   });
 
   // ASIGNACIONES (Reglas de Negocio Estrictas)
-  app.get('/api/asignaciones', (req: Request, res: Response) => {
+  app.get('/api/asignaciones', (_req: Request, res: Response) => {
     res.json(db.getAsignaciones());
   });
 
@@ -234,7 +218,7 @@ async function startServer() {
   });
 
   // MANTENIMIENTOS
-  app.get('/api/mantenimientos', (req: Request, res: Response) => {
+  app.get('/api/mantenimientos', (_req: Request, res: Response) => {
     res.json(db.getMantenimientos());
   });
 
@@ -269,7 +253,7 @@ async function startServer() {
   });
 
   // CONTRATOS DE MANTENIMIENTO
-  app.get('/api/contratos', (req: Request, res: Response) => {
+  app.get('/api/contratos', (_req: Request, res: Response) => {
     res.json(db.getContratos());
   });
 
@@ -292,11 +276,11 @@ async function startServer() {
   });
 
   // ALERTAS AUTOMÁTICAS
-  app.get('/api/alertas', (req: Request, res: Response) => {
+  app.get('/api/alertas', (_req: Request, res: Response) => {
     res.json(db.getAlertas());
   });
 
-  app.get('/api/alertas/no-leidas', (req: Request, res: Response) => {
+  app.get('/api/alertas/no-leidas', (_req: Request, res: Response) => {
     res.json(db.getAlertas(true));
   });
 
@@ -309,7 +293,7 @@ async function startServer() {
     }
   });
 
-  app.put('/api/alertas/leer-todas', (req: Request, res: Response) => {
+  app.put('/api/alertas/leer-todas', (_req: Request, res: Response) => {
     try {
       const result = db.marcarTodasAlertasLeidas();
       res.json({ status: 'ok', ...result });
@@ -340,7 +324,7 @@ async function startServer() {
     }
   });
 
-  app.post('/api/alertas/ejecutar-revision', (req: Request, res: Response) => {
+  app.post('/api/alertas/ejecutar-revision', (_req: Request, res: Response) => {
     const generadas = db.ejecutarRevisionAlertas();
     res.json({ mensaje: `Proceso de revisión completado. Nuevas alertas generadas: ${generadas}` });
   });
@@ -350,23 +334,23 @@ async function startServer() {
     res.json(db.getHistorialPorMaquina(Number(req.params.id)));
   });
 
-  app.get('/api/bitacora', (req: Request, res: Response) => {
+  app.get('/api/bitacora', (_req: Request, res: Response) => {
     res.json(db.getBitacora());
   });
 
   // DASHBOARD
-  app.get('/api/dashboard', (req: Request, res: Response) => {
+  app.get('/api/dashboard', (_req: Request, res: Response) => {
     res.json(db.getDashboardStats());
   });
 
   // DESCARGAS
-  app.get('/api/download-zip', (req: Request, res: Response) => {
+  app.get('/api/download-zip', (_req: Request, res: Response) => {
     const zipPath = path.join(process.cwd(), 'proyecto_soldadura_industrial.zip');
     res.download(zipPath, 'proyecto_soldadura_industrial.zip');
   });
 
   // REPORTES DATA
-  app.get('/api/reportes', (req: Request, res: Response) => {
+  app.get('/api/reportes', (_req: Request, res: Response) => {
     res.json({
       tecnicos: db.getTecnicos(),
       maquinas: db.getMaquinas(),
@@ -390,7 +374,7 @@ async function startServer() {
   } else {
     const distPath = path.join(process.cwd(), 'dist');
     app.use(express.static(distPath));
-    app.get('*', (req, res) => {
+    app.get('*', (_req, res) => {
       res.sendFile(path.join(distPath, 'index.html'));
     });
   }

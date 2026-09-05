@@ -8,7 +8,6 @@ import {
   Shield,
   UserX,
   UserCheck,
-  Check,
   X,
   Edit2
 } from 'lucide-react';

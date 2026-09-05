@@ -6,7 +6,6 @@ import {
   Mantenimiento,
   ContratoMantenimiento,
   Alerta,
-  HistorialMaquina,
   BitacoraRegistro,
   DashboardStats
 } from '../types';

@@ -3,7 +3,6 @@ import { Maquina, Tecnico, Asignacion, Mantenimiento, ContratoMantenimiento, Bit
 import { exportReportToPDF, ReportType } from '../utils/pdfExport';
 import {
   FileSpreadsheet,
-  Download,
   Filter,
   Cpu,
   HardHat,
@@ -12,7 +11,6 @@ import {
   ShieldCheck,
   Check,
   FileDown,
-  Layers,
   Shield
 } from 'lucide-react';
 
@@ -105,10 +103,6 @@ export const ReportesView: React.FC<ReportesViewProps> = ({
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-  };
-
-  const handlePrint = () => {
-    window.print();
   };
 
   return (

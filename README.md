@@ -117,11 +117,3 @@ gestion_tecnicos_soldadura/
 
 ## 📜 Licencia
 Desarrollado para el proyecto académico y tesis universitaria *"Sistema Web de Gestión de Técnicos y Máquinas de Soldar"*.
-
----
-
-## ☁️ Despliegue en Render + Supabase
-
-Esta copia está preparada para despliegue gratuito en Render mediante `render.yaml` y persistencia opcional en Supabase. Para el procedimiento completo consulta `GUIA_PUBLICACION_RENDER_SUPABASE.md`.
-
-El endpoint `/api/health` permite comprobar el estado del servicio y muestra si la persistencia activa es `supabase`, `local-json` o `local-json-fallback`.

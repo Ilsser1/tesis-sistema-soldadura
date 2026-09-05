@@ -1,22 +1,16 @@
 import React from 'react';
 import { TabType } from './Sidebar';
-import { RolUsuario } from '../types';
 import {
   LayoutDashboard,
   Cpu,
   Link2,
   Wrench,
-  Menu,
-  Bell,
-  UserCheck,
-  FileText,
-  BarChart3
+  Menu
 } from 'lucide-react';
 
 interface MobileBottomNavProps {
   activeTab: TabType;
   onTabChange: (tab: TabType) => void;
-  userRole: RolUsuario;
   unreadAlertsCount: number;
   onOpenMobileDrawer: () => void;
 }
@@ -24,7 +18,6 @@ interface MobileBottomNavProps {
 export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
   activeTab,
   onTabChange,
-  userRole,
   unreadAlertsCount,
   onOpenMobileDrawer
 }) => {

@@ -2,13 +2,9 @@ import React, { useState } from 'react';
 import { Alerta } from '../types';
 import {
   Bell,
-  CheckCircle2,
   Trash2,
   Search,
   Check,
-  AlertTriangle,
-  AlertOctagon,
-  Clock,
   ExternalLink
 } from 'lucide-react';
 

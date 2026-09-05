@@ -67,6 +67,7 @@ export interface Tecnico {
   fecha_ingreso: string;
   estado: 'Activo' | 'Inactivo';
   usuario_id?: number | null;
+  homologado?: boolean;
   // Dynamic fields
   maquinas_asignadas_count?: number;
   mantenimientos_count?: number;

@@ -19,16 +19,13 @@ import {
   Pencil,
   Trash2,
   X,
-  UserCheck,
-  Building2,
-  Filter
+  UserCheck
 } from 'lucide-react';
 
 interface MantenimientosViewProps {
   mantenimientos: Mantenimiento[];
   maquinas: Maquina[];
   tecnicos?: Tecnico[];
-  usuarios?: Usuario[];
   currentUser?: Usuario;
   onCrear: (m: Partial<Mantenimiento>) => Promise<void>;
   onActualizar: (id: number, m: Partial<Mantenimiento>) => Promise<void>;
@@ -40,7 +37,6 @@ export const MantenimientosView: React.FC<MantenimientosViewProps> = ({
   mantenimientos,
   maquinas,
   tecnicos = [],
-  usuarios = [],
   currentUser,
   onCrear,
   onActualizar,
@@ -57,11 +53,14 @@ export const MantenimientosView: React.FC<MantenimientosViewProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
-  // Modo de asignación en modal: 'cuenta' (técnico interno) o 'externo' (proveedor tercero)
+  // Modo de asignación en modal: 'cuenta' (Técnicos Propios) o 'externo' (proveedor tercero)
   const [asignacionModo, setAsignacionModo] = useState<'cuenta' | 'externo'>('cuenta');
 
+  // Técnicos propios homologados y activos
+  const tecnicosHomologados = (tecnicos || []).filter(t => t.estado === 'Activo' && t.homologado === true);
+
   // Encontrar si el usuario actual tiene perfil de técnico
-  const myTecnicoProfile = tecnicos.find(
+  const myTecnicoProfile = tecnicosHomologados.find(
     t => (currentUser && t.correo && t.correo.toLowerCase() === currentUser.correo.toLowerCase()) ||
          (currentUser && t.usuario_id === currentUser.id)
   );
@@ -69,13 +68,13 @@ export const MantenimientosView: React.FC<MantenimientosViewProps> = ({
   // Inicialización de técnico por defecto
   const defaultTecnicoName = myTecnicoProfile
     ? `${myTecnicoProfile.nombre} ${myTecnicoProfile.apellido} (${myTecnicoProfile.correo})`
-    : tecnicos.length > 0
-    ? `${tecnicos[0].nombre} ${tecnicos[0].apellido} (${tecnicos[0].correo})`
+    : tecnicosHomologados.length > 0
+    ? `${tecnicosHomologados[0].nombre} ${tecnicosHomologados[0].apellido} (${tecnicosHomologados[0].correo})`
     : currentUser
     ? `${currentUser.nombre} ${currentUser.apellido} (${currentUser.correo})`
     : 'Taller Interno PRODIMA';
 
-  const defaultTecnicoId = myTecnicoProfile ? myTecnicoProfile.id : tecnicos.length > 0 ? tecnicos[0].id : undefined;
+  const defaultTecnicoId = myTecnicoProfile ? myTecnicoProfile.id : tecnicosHomologados.length > 0 ? tecnicosHomologados[0].id : undefined;
 
   const [formData, setFormData] = useState({
     maquina_id: maquinas.length > 0 ? maquinas[0].id : 1,
@@ -144,25 +143,13 @@ export const MantenimientosView: React.FC<MantenimientosViewProps> = ({
 
   const handleSelectTecnicoAccount = (tecnicoIdStr: string) => {
     const tecId = Number(tecnicoIdStr);
-    const tec = tecnicos.find(t => t.id === tecId);
+    const tec = tecnicosHomologados.find(t => t.id === tecId);
     if (tec) {
       setFormData(prev => ({
         ...prev,
         tecnico_id: tec.id,
         tecnico_responsable: `${tec.nombre} ${tec.apellido} (${tec.correo})`,
         proveedor: prev.proveedor === 'Taller Interno PRODIMA' || !prev.proveedor ? 'Taller Interno PRODIMA' : prev.proveedor
-      }));
-    }
-  };
-
-  const handleSelectUserAccount = (userIdStr: string) => {
-    const uId = Number(userIdStr);
-    const u = usuarios.find(user => user.id === uId);
-    if (u) {
-      setFormData(prev => ({
-        ...prev,
-        tecnico_responsable: `${u.nombre} ${u.apellido} (${u.correo})`,
-        proveedor: 'Taller Interno PRODIMA'
       }));
     }
   };
@@ -313,12 +300,14 @@ export const MantenimientosView: React.FC<MantenimientosViewProps> = ({
             </button>
           )}
 
-          <button
-            onClick={() => handleOpenModal()}
-            className="px-4 py-2 bg-amber-500 hover:bg-amber-600 active:scale-95 text-slate-950 font-bold text-xs rounded-xl flex items-center gap-1.5 transition shadow-lg shadow-amber-500/10 cursor-pointer"
-          >
-            <Plus className="w-4 h-4" /> Nuevo Mantenimiento
-          </button>
+          {!isReadOnly && (
+            <button
+              onClick={() => handleOpenModal()}
+              className="px-4 py-2 bg-amber-500 hover:bg-amber-600 active:scale-95 text-slate-950 font-bold text-xs rounded-xl flex items-center gap-1.5 transition shadow-lg shadow-amber-500/10 cursor-pointer"
+            >
+              <Plus className="w-4 h-4" /> Nuevo Mantenimiento
+            </button>
+          )}
         </div>
       </div>
 
@@ -578,12 +567,12 @@ export const MantenimientosView: React.FC<MantenimientosViewProps> = ({
                 </select>
               </div>
 
-              {/* ASIGNACIÓN A CUENTA (TÉCNICO) */}
+              {/* ASIGNACIÓN A TÉCNICOS PROPIOS */}
               <div className="bg-slate-800/60 p-3 rounded-xl border border-slate-700/80 space-y-2.5">
                 <div className="flex items-center justify-between">
                   <label className="block text-slate-300 font-semibold flex items-center gap-1.5">
                     <UserCheck className="w-4 h-4 text-amber-400" />
-                    Asignar a Cuenta de Técnico
+                    Técnicos Propios
                   </label>
 
                   {/* Selector de Modo */}
@@ -597,7 +586,7 @@ export const MantenimientosView: React.FC<MantenimientosViewProps> = ({
                           : 'text-slate-400 hover:text-slate-200'
                       }`}
                     >
-                      Cuenta Interna
+                      Técnicos Propios
                     </button>
                     <button
                       type="button"
@@ -623,34 +612,13 @@ export const MantenimientosView: React.FC<MantenimientosViewProps> = ({
                       onChange={e => handleSelectTecnicoAccount(e.target.value)}
                       className="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-slate-200 focus:outline-none focus:border-amber-500"
                     >
-                      <option value="" disabled>-- Seleccione un Técnico --</option>
-                      {tecnicos.map(t => (
+                      <option value="" disabled>-- Seleccione un Técnico Homologado --</option>
+                      {tecnicosHomologados.map(t => (
                         <option key={t.id} value={t.id}>
-                          {t.nombre} {t.apellido} — {t.especialidad} ({t.correo || t.codigo_empleado})
+                          {t.nombre} {t.apellido} — {t.especialidad} (Homologado)
                         </option>
                       ))}
                     </select>
-
-                    {/* También permitir elegir usuarios con rol Técnico o Supervisor si no están en técnicos */}
-                    {usuarios.length > 0 && (
-                      <div className="pt-1">
-                        <span className="text-[10px] text-slate-500 block mb-1">
-                          O bien, asignar a otra cuenta de usuario:
-                        </span>
-                        <select
-                          onChange={e => handleSelectUserAccount(e.target.value)}
-                          className="w-full bg-slate-900/70 border border-slate-700/60 rounded-lg p-1.5 text-[11px] text-slate-300"
-                          defaultValue=""
-                        >
-                          <option value="" disabled>-- Seleccionar por cuenta de usuario --</option>
-                          {usuarios.map(u => (
-                            <option key={u.id} value={u.id}>
-                              @{u.username} ({u.nombre} {u.apellido}) — Rol: {u.rol}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    )}
 
                     <div className="text-[11px] text-amber-400/90 font-medium bg-amber-500/10 border border-amber-500/20 px-2.5 py-1.5 rounded-lg flex items-center gap-1.5">
                       <UserCheck className="w-3.5 h-3.5 shrink-0" />

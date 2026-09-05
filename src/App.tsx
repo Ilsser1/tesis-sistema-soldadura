@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
   Usuario,
-  RolUsuario,
   Maquina,
   Tecnico,
   Asignacion,
@@ -10,7 +9,6 @@ import {
   Alerta,
   Bitacora,
   DashboardStats,
-  HistorialMaquina,
   HistorialCompletoMaquina
 } from './types';
 import { api } from './services/api';
@@ -136,76 +134,6 @@ export function App() {
     }
   }, [selectedHistoryMachineId]);
 
-  // Direct switch between defined system users
-  const handleSwitchUserAccount = (username: string) => {
-    const predefined: Record<string, Partial<Usuario>> = {
-      admin: {
-        id: 1,
-        nombre: 'Admin',
-        apellido: 'PRODIMA',
-        correo: 'admin@prodima.gt',
-        username: 'admin',
-        rol: 'Administrador',
-        estado: 'Activo'
-      },
-      ohernandez: {
-        id: 2,
-        nombre: 'Osmar',
-        apellido: 'Hernández',
-        correo: 'ohernandez@prodima.gt',
-        username: 'ohernandez',
-        rol: 'Supervisor',
-        estado: 'Activo'
-      },
-      lclaveria: {
-        id: 3,
-        nombre: 'Luis',
-        apellido: 'Claveria',
-        correo: 'lclaveria@prodima.gt',
-        username: 'lclaveria',
-        rol: 'Supervisor',
-        estado: 'Activo'
-      },
-      dlopez: {
-        id: 4,
-        nombre: 'David',
-        apellido: 'López',
-        correo: 'dlopez@prodima.gt',
-        username: 'dlopez',
-        rol: 'Técnico',
-        estado: 'Activo'
-      },
-      iguatemala: {
-        id: 5,
-        nombre: 'Ilsser',
-        apellido: 'Guatemala',
-        correo: 'iguatemalam@miumg.edu.gt',
-        username: 'iguatemala',
-        rol: 'Técnico',
-        estado: 'Activo'
-      }
-    };
-
-    const target = predefined[username];
-    if (target) {
-      setCurrentUser(prev => ({
-        ...prev,
-        ...target
-      } as Usuario));
-    }
-  };
-
-  // Role quick switcher fallback
-  const handleRoleSwitch = (newRole: RolUsuario) => {
-    if (newRole === 'Administrador') {
-      handleSwitchUserAccount('admin');
-    } else if (newRole === 'Supervisor') {
-      handleSwitchUserAccount('ohernandez');
-    } else {
-      handleSwitchUserAccount('dlopez');
-    }
-  };
-
   const handleLogin = async (usr: string, pass: string) => {
     try {
       const response = await api.login(usr, pass);
@@ -330,7 +258,74 @@ export function App() {
 
   // Mantenimientos
   const handleCrearMantenimiento = async (m: Partial<Mantenimiento>) => {
-    await api.crearMantenimiento(m, currentUser.id);
+    // 1. Validar automáticamente si la máquina seleccionada tiene un contrato de mantenimiento activo
+    const contratoActivo = contratos.find(
+      c => c.maquina_id === m.maquina_id && ['Vigente', 'Próximo a vencer'].includes(c.estado)
+    );
+
+    // Preparar notas de contrato y proveedor según validación
+    let proveedorAjustado = m.proveedor;
+    let observacionesAjustadas = m.observaciones || '';
+
+    if (contratoActivo) {
+      proveedorAjustado = contratoActivo.proveedor;
+      const tagContrato = `[Póliza Activa: ${contratoActivo.numero_contrato}]`;
+      if (!observacionesAjustadas.includes(tagContrato)) {
+        observacionesAjustadas = `${tagContrato} ${observacionesAjustadas}`.trim();
+      }
+    } else {
+      const tagSinContrato = `[Sin contrato activo]`;
+      if (!observacionesAjustadas.includes(tagSinContrato)) {
+        observacionesAjustadas = `${tagSinContrato} ${observacionesAjustadas}`.trim();
+      }
+    }
+
+    const payloadMantenimiento: Partial<Mantenimiento> = {
+      ...m,
+      proveedor: proveedorAjustado,
+      observaciones: observacionesAjustadas
+    };
+
+    // 2. Proceder con el registro del mantenimiento en el backend
+    const nuevoMant = await api.crearMantenimiento(payloadMantenimiento, currentUser.id);
+
+    // 3. Coherencia: Si tiene un mantenimiento, debe tener la máquina asignada directamente al técnico
+    if (m.tecnico_id && m.maquina_id) {
+      const asignacionActiva = asignaciones.find(
+        a => a.maquina_id === m.maquina_id && a.estado === 'Activa'
+      );
+
+      if (!asignacionActiva || asignacionActiva.tecnico_id !== m.tecnico_id) {
+        if (asignacionActiva) {
+          await api.finalizarAsignacion(
+            asignacionActiva.id,
+            currentUser.id,
+            `Reasignación directa para ejecución de orden de mantenimiento #${nuevoMant?.id || ''}`
+          );
+        }
+
+        await api.crearAsignacion({
+          tecnico_id: m.tecnico_id,
+          maquina_id: m.maquina_id,
+          motivo: `Asignación técnica directa por orden de mantenimiento ${m.tipo || 'Preventivo'}: ${m.descripcion || ''}`,
+          observaciones: `Asignación automática directa generada por orden #${nuevoMant?.id || ''} (${contratoActivo ? `Bajo póliza ${contratoActivo.numero_contrato}` : 'Sin contrato activo'})`,
+          usuario_id: currentUser.id
+        });
+      }
+    }
+
+    // 4. Actualizar el historial de la máquina si está seleccionada en pantalla
+    if (m.maquina_id) {
+      try {
+        const histData = await api.getHistorialMaquina(m.maquina_id);
+        if (selectedHistoryMachineId === m.maquina_id) {
+          setHistorialData(histData);
+        }
+      } catch (err) {
+        console.warn('Historial refrescado en recarga general:', err);
+      }
+    }
+
     await reloadData();
   };
 
@@ -430,9 +425,6 @@ export function App() {
         onNavigateToAlerts={() => setActiveTab('alertas')}
         onOpenAlerts={() => setActiveTab('alertas')}
         onOpenLoginModal={() => setIsLoginModalOpen(true)}
-        onRoleSwitch={handleRoleSwitch}
-        onRoleChange={handleRoleSwitch}
-        onSwitchUserAccount={handleSwitchUserAccount}
         onToggleMobileMenu={() => setIsMobileMenuOpen(prev => !prev)}
         onLogout={handleLogout}
       />
@@ -518,7 +510,6 @@ export function App() {
                   mantenimientos={mantenimientos}
                   maquinas={maquinas}
                   tecnicos={tecnicos}
-                  usuarios={usuarios}
                   currentUser={currentUser}
                   onCrear={handleCrearMantenimiento}
                   onActualizar={handleActualizarMantenimiento}
@@ -592,7 +583,6 @@ export function App() {
       <MobileBottomNav
         activeTab={activeTab}
         onTabChange={setActiveTab}
-        userRole={currentUser.rol}
         unreadAlertsCount={unreadAlertsCount}
         onOpenMobileDrawer={() => setIsMobileMenuOpen(true)}
       />

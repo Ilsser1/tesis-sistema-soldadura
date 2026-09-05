@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { ShieldCheck, KeyRound, Mail, X, CheckCircle2, Lock, AlertCircle } from 'lucide-react';
+import { KeyRound, Mail, X, CheckCircle2, AlertCircle } from 'lucide-react';
 import { RolUsuario } from '../types';
 import { ProdimaLogo } from './ProdimaLogo';
 

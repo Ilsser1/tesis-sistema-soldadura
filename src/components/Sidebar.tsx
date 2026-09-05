@@ -200,6 +200,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <div className="text-amber-500/90 font-medium">PBX: (502) 2472-7019</div>
           </div>
         </div>
+
+        {onLogout && (
+          <button
+            onClick={() => {
+              if (onMobileClose) onMobileClose();
+              onLogout();
+            }}
+            className="w-full p-2 bg-slate-950/40 hover:bg-red-500/10 text-red-400 hover:text-red-300 rounded-xl border border-slate-800/80 hover:border-red-500/30 text-xs font-semibold flex items-center justify-center gap-2 transition cursor-pointer"
+          >
+            <LogOut className="w-3.5 h-3.5" />
+            <span>Cerrar Sesión</span>
+          </button>
+        )}
       </div>
     </div>
   );
